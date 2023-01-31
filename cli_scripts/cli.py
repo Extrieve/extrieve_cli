@@ -5,25 +5,25 @@ from cli_scripts import __appname__, __version__
 
 app = typer.Typer()
 
-@app.command()
+@app.command(help = "Clean a directory", name = "clean", no_args_is_help = True)
 def clean_directory(
-    directory: str = typer.Argument(
-        ...,
-        help="Directory to clean"
-    ),
-    folder_to_remove: Optional[str] = typer.Option(
-        None,
-        "--folder",
-        "-f",
-        help="I will remove any folder in this directory with this name"
-    ),
-    file_to_remove: Optional[str] = typer.Option(
-        None,
-        "--file",
-        "-F",
-        help="I will remove any file in this directory with this name"
-    )
-) -> None:
+        directory: str = typer.Argument(
+            ...,
+            help="Directory to clean"
+        ),
+        folder_to_remove: Optional[str] = typer.Option(
+            None,
+            "--folder",
+            "-f",
+            help="I will remove any folder in this directory with this name or name containing this string"
+        ),
+        file_to_remove: Optional[str] = typer.Option(
+            None,
+            "--file",
+            "-F",
+            help="I will remove any file in this directory with this name"
+        )
+    ) -> None:
     # Access the directory
     if not os.path.isdir(directory):
         typer.echo(f"Directory {directory} does not exist")
@@ -37,6 +37,8 @@ def clean_directory(
         for folder in os.listdir():
             if os.path.isdir(folder) and not file_to_remove:
                 shutil.rmtree(folder)
+                # log to user
+                typer.echo(f"Removed {folder}")
             elif os.path.isdir(folder) and file_to_remove:
                 for file in os.listdir(folder):
                     if file == file_to_remove:
@@ -46,7 +48,7 @@ def clean_directory(
 
     if folder_to_remove:
         for folder in os.listdir():
-            if folder == folder_to_remove:
+            if folder_to_remove in folder:
                 shutil.rmtree(folder)
             else:
                 continue
